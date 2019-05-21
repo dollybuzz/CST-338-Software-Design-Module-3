@@ -1,0 +1,671 @@
+import java.util.Scanner;
+import java.util.Random;
+
+/*
+ * Title:   Module Three Assignment - Deck of Cards
+ * Author:  Team 4 - Abby Packham, Dalia Faria, Carlos Orduna,
+ *          Roger Terril, George Blombach
+ * Date:    May 20, 2019
+ */
+
+/* Purpose: Main class Assig3
+ * Preconditions: None
+ * Postconditions: None
+ */
+public class Assig3
+{
+   //test routine for phase 1
+   public static void main1(String[] args)
+   {
+      Card cardOne = new Card('A', Card.Suit.SPADES);
+      Card cardTwo = new Card('1', Card.Suit.DIAMONDS);
+      Card cardThree = new Card('J', Card.Suit.CLUBS);
+
+      System.out.print(cardOne.toString());
+      System.out.print(cardTwo.toString());
+      System.out.print(cardThree.toString());
+
+      cardOne.set('0', Card.Suit.HEARTS);
+      cardTwo.set('Q', Card.Suit.SPADES);
+
+      System.out.println();
+      System.out.print(cardOne.toString());
+      System.out.print(cardTwo.toString());
+      System.out.print(cardThree.toString());
+   }
+
+   //test routine for phase 2
+   public static void main2(String[] args)
+   {
+      //create four cards and one hand
+      Card cardOne = new Card('3', Card.Suit.HEARTS);
+      Card cardTwo = new Card('6', Card.Suit.DIAMONDS);
+      Card cardThree = new Card('9', Card.Suit.CLUBS);
+      Card cardFour = new Card('K', Card.Suit.SPADES);
+      Hand myHand = new Hand();
+
+      //populate the hand
+      for (int i = 0;i < myHand.MAX_CARDS; i += 4)
+      {
+         myHand.takeCard(cardOne);
+         myHand.takeCard(cardTwo);
+         myHand.takeCard(cardThree);
+         myHand.takeCard(cardFour);
+      }
+
+      //print out the hand
+      System.out.println("After deal:\nHand = ( " + myHand.toString() + ")");
+
+      //check position 13
+      System.out.println("Card 13 is " + myHand.inspectCard(13));
+
+      //play the hand
+      while (myHand.getNumCards() > 0)
+      {
+         System.out.print("Playing " + myHand.playCard());
+      }
+
+      //check position 13 again
+      System.out.println("Card 13 is " + myHand.inspectCard(13).toString());
+
+      //print hand again
+      System.out.println("After playing all cards:\nHand = ("
+            + myHand.toString() + " )");
+   }
+   //test routine for phase 3
+   public static void main3(String[] args)
+   {
+      //setup double deck
+      Deck myDeck = new Deck(2);
+      //deal cards
+      while (myDeck.getTopCard()-1 >= 0)
+      {
+         System.out.print(myDeck.dealCard().toString() + " / ");
+      }
+      //reinitialize deck
+      myDeck.init(2);
+      //shuffle deck
+      myDeck.shuffle();
+      //deal cards again
+      System.out.println("\n");
+      while (myDeck.getTopCard()-1 >= 0)
+      {
+         System.out.print(myDeck.dealCard().toString() + " / ");
+      }
+
+      //setup single deck
+      myDeck = new Deck();
+      //deal cards
+      System.out.println("\n");
+      while (myDeck.getTopCard()-1 >= 0)
+      {
+         System.out.print(myDeck.dealCard().toString() + " / ");
+      }
+      //reinitialize deck
+      myDeck.init(1);
+      //shuffle deck
+      myDeck.shuffle();
+      //deal cards again
+      System.out.println("\n");
+      while (myDeck.getTopCard()-1 >= 0)
+      {
+         System.out.print(myDeck.dealCard().toString() + " / ");
+      }
+   }
+
+   //test routing for phase 4
+   public static void main(String[] args)
+   {
+      //initialize
+      Scanner keyboard = new Scanner(System.in);
+      int numHands = -1;
+
+      //start game loop
+      while (numHands != 0)
+      {
+         //setup single deck
+         Deck singleDeck = new Deck();
+
+         //get input from player
+         do
+         {
+            System.out.print("How many hands? (1 - 10 only, 0 to quit)");
+            while (!keyboard.hasNextInt()) {
+               System.out.println("That's not a valid number!\nHow many hands?"
+                     + " (1 - 10 only, 0 to quit)\"); ");
+               keyboard.next(); // this is important!
+            }
+            numHands = keyboard.nextInt();
+         } while (numHands < 0 || numHands > 10);
+
+         if (numHands !=0)
+         {
+            //create hand array
+            Hand hands[] = new Hand[numHands];
+
+            //loop through number of hands to initialize
+            for(int i = 0; i < numHands; i++)
+               hands[i] = new Hand();
+
+            //get number of cards in deck
+            int lastCard = singleDeck.getTopCard();
+
+            //first deal from unshuffled deck
+            for(int i = 0; i < lastCard; i++)
+               hands[i%numHands].takeCard(singleDeck.dealCard());
+
+            //print out the hand
+            System.out.println("\nHere are our hands, from unshuffled deck:");
+            for (int i = 0; i < numHands; i++)
+               System.out.println("\nPlayer " + (i+1) + " Hand = ( "
+                     + hands[i].toString() + " )");
+
+            //reinitialize deck
+            singleDeck.init(1);
+            //loop through number of hands to initialize hands array
+            for(int i = 0; i < numHands; i++)
+               hands[i] = new Hand();
+
+            //shuffle the deck
+            singleDeck.shuffle();
+
+            //second deal from shuffled deck
+            for(int i = 0; i < lastCard; i++)
+               hands[i%numHands].takeCard(singleDeck.dealCard());
+
+            //print out the hand
+            System.out.println("\nHere are our hands, from shuffled deck:");
+            for (int i = 0; i < numHands; i++)
+               System.out.println("\nPlayer " + (i+1) + " Hand = ( "
+                     + hands[i].toString() + " )");
+         }
+
+      }
+      System.out.println("Game over.");
+      //close scanner
+      keyboard.close();
+   }
+}
+
+/* Purpose: Class Card
+ * Preconditions:
+ * Postconditions:
+ */
+class Card
+{
+   // declare object variables
+   public enum Suit {CLUBS, DIAMONDS, HEARTS, SPADES}
+   private char value;
+   private Suit suit;
+   private boolean errorFlag;
+
+   /* Purpose: card class constructor
+    * Preconditions: value and suit
+    * Postconditions: none
+    */
+   public Card(char value, Suit suit)
+   {
+      //construct object with passed values
+      set(value, suit);
+   }
+
+   /* Purpose: overloaded constructor with default value and suit
+    * Preconditions: none
+    * Postconditions: none
+    */
+   public Card()
+   {
+      //setup default values
+      char defaultValue = 'A';
+      Suit defaultSuit = Suit.SPADES;
+      //construct object
+      set(defaultValue, defaultSuit);
+   }
+
+   /* Purpose:
+    * Preconditions: Requires access to the string attributes.
+    * Postconditions: Returns the string attributes as a single string.
+    */
+   public String toString()
+   {
+      if(this.errorFlag == true)
+         return "** illegal **\n";
+      else
+         return getValue() + " of " + getSuit();
+   }
+
+   /* Purpose: mutator method set()
+    * Preconditions: card value, card suit
+    * Postconditions: Returns boolean
+    */
+   public boolean set(char value, Suit suit)
+   {
+      if(isValid(value, suit))
+      {
+         this.value = value;
+         this.suit = suit;
+         errorFlag = false;
+         return true;
+      }
+      else
+      {
+         errorFlag = true;
+         return false;
+      }
+   }
+
+   /* Purpose: Accessor method for value
+    * Preconditions: none
+    * Postconditions: Returns object value
+    */
+   public char getValue()
+   {
+      return this.value;
+   }
+
+   /* Purpose: Accessor method for suit
+    * Preconditions:
+    * Postconditions: Returns suit
+    */
+   public Suit getSuit()
+   {
+      return this.suit;
+   }
+
+   /* Purpose: Accessor method for errorFlag value
+    * Preconditions: none
+    * Postconditions: Returns object boolean
+    */
+   public boolean getErrorFlag()
+   {
+      return this.errorFlag;
+   }
+
+   /* Purpose: Method equals() checks card object value and suite
+    * Preconditions: card object
+    * Postconditions: Returns boolean
+    */
+   public boolean equals(Card card)
+   {
+      if (this.value == card.value && this.suit == card.suit)
+         return true;
+      else
+         return false;
+   }
+
+   /* Purpose: method isValid() checks for valid card value
+    * Preconditions: char value, Suit suit
+    * Postconditions: Returns boolean
+    */
+   private boolean isValid(char value, Suit suit)
+   {
+      String cardValues = "A23456789TJQK";
+      if (cardValues.indexOf(value) != -1)
+         return true;
+      else
+         return false;
+   }
+}
+/* Purpose: Hand class manages array of cards
+ * Preconditions: none
+ * Postconditions: none
+ */
+
+class Hand
+{
+   //declare variables
+   public static final int MAX_CARDS = 100;
+   public Card[] myCards = new Card[MAX_CARDS];
+   private static int numCards;
+
+   /* Purpose: Hand class constructor
+    * Preconditions:
+    * Postconditions:
+    */
+   public Hand()
+   {
+      //initialize
+      numCards = 0;
+   }
+
+   /* Purpose: Method resetHand() empties card array
+    * Preconditions: none
+    * Postconditions: none
+    */
+   public void resetHand()
+   {
+      //reset array to empty
+      myCards = new Card[MAX_CARDS];
+   }
+
+   /* Purpose: Method takeCard() adds card to card array in hand
+    * Preconditions: Card as input
+    * Postconditions: Returns boolean
+    */
+   public boolean takeCard(Card card)
+   {
+      //add card to array by copying attributes/values to new object
+      myCards[numCards] = new Card(card.getValue(), card.getSuit());
+      //increment card counter
+      numCards++;
+
+      return true;
+   }
+
+   /* Purpose: Method playCard() plays card and removes from card array
+    * Preconditions: None
+    * Postconditions: Returns Card object
+    */
+   public Card playCard()
+   {
+      //decrement card counter
+      numCards --;
+      //copy card to temp object
+      Card tempCard = myCards[numCards];
+      //reset card object in array
+      myCards[numCards] = null;
+
+      return tempCard;
+   }
+
+   /* Purpose: Method toString() returns members of array
+    * Preconditions: None
+    * Postconditions: Returns string
+    */
+   public String toString()
+   {
+      String thisString = "";
+      //convert array to string
+      for (int i=0;i < MAX_CARDS; i++)
+      {
+         if (myCards[i] != null )
+            thisString +=  myCards[i].toString() + ", ";
+      }
+      //remove new line
+      // thisString = thisString.replace("\n",", ");
+
+      return thisString;
+   }
+
+   /* Purpose: Method getNumCards() returns card counter
+    * Preconditions: None
+    * Postconditions: Returns integer
+    */
+   public int getNumCards()
+   {
+      return this.numCards;
+   }
+
+   /* Purpose: Method inspectCard() returns array contents at location
+    * Preconditions: Integer for array pointer
+    * Postconditions: Returns card
+    *
+    */
+   public Card inspectCard(int k)
+   {
+      if (myCards[k] != null)
+         return myCards[k];
+      else
+      {
+         Card badCard = new Card('0',Card.Suit.SPADES);
+         return badCard;
+      }
+   }
+}
+
+class Deck
+{
+   public static final int MAX_CARDS = 6 * 52;
+   private static Card[] masterPack = new Card[52];
+   private Card[] cards = new Card[MAX_CARDS];
+   private int topCard;
+
+   /* Purpose: Deck constructor that populates the arrays
+    * Preconditions: Integer for number of packs
+    * Postconditions: Creates Deck object
+    *
+    */
+   public Deck(int numPacks)
+   {
+      allocateMasterPack();
+      for (topCard = 0 ; topCard <= masterPack.length* numPacks; topCard++)
+         cards[topCard] = masterPack[topCard%52];
+   }
+
+   /* Purpose: overloaded Deck constructor that populates the arrays
+    * Preconditions: none
+    * Postconditions: creates Deck object
+    *
+    */
+   public Deck()
+   {
+      allocateMasterPack();
+      for (topCard = 0 ; topCard < masterPack.length; topCard++)
+         cards[topCard] = masterPack[topCard%52];
+   }
+
+   /* Purpose: Method init() repopulates the card array from master pack
+    * Preconditions: Integer for array pointer
+    * Postconditions: Returns card
+    *
+    */
+   public void init(int numPacks)
+   {
+      //set topCard value
+      topCard = numPacks * masterPack.length;
+
+      //populate card array from master pack
+      for(int i = 0; i < topCard; i++)
+         cards[i] = masterPack[i%52];
+   }
+
+   /* Purpose: Method shuffle() randomizes cards in array
+    * Preconditions: none
+    * Postconditions: none
+    *
+    */
+   public void shuffle()
+   {
+      Random rgen = new Random();  // Random number generator
+
+      for (int i=0; i<topCard; i++) {
+         int randomPosition = rgen.nextInt(topCard);
+         //get a random int inside topCard
+         //swap card with temporary position
+         Card temp = cards[i];
+         cards[i] = cards[randomPosition];
+         cards[randomPosition] = temp;
+      }
+   }
+
+   /* Purpose: Method dealCard() returns top card and removed from card array
+    * Preconditions: none
+    * Postconditions: Returns card
+    *
+    */
+   public Card dealCard()
+   {
+      //decrement card counter
+      topCard --;
+      if (topCard >= 0)
+      {
+         //copy card to temp object
+         Card tempCard = cards[topCard];
+         //reset card object in array
+         cards[topCard] = null;
+         return tempCard;
+      }
+      else
+         return null;
+   }
+
+   /* Purpose: Accessor method getTopCard() for getting top card array index
+    * Preconditions: none
+    * Postconditions: Returns integer
+    *
+    */
+   public int getTopCard()
+   {
+      return topCard;
+   }
+
+   /* Purpose: Method inspectCard() returns array contents at location
+    * Preconditions: Integer for array pointer
+    * Postconditions: Returns card
+    *
+    */
+   public Card inspectCard(int k)
+   {
+      if (cards[k] != null)
+         return cards[k];
+      else
+      {
+         Card badCard = new Card('0',Card.Suit.SPADES);
+         return badCard;
+      }
+   }
+
+   /* Purpose: Method allocateMasterPack() populates master deck
+    * Preconditions: None
+    * Postconditions: None
+    *
+    */
+   private static void allocateMasterPack()
+   {
+      //populate master pack
+      if (masterPack[0] == null) //check if master pack was already created
+      {
+         //define card values
+         String cardValues = "A23456789TJQK";
+         //iterate card string
+         for(int i = 0; i < cardValues.length(); i++)
+         {
+            //create each suit per card value
+            masterPack[i] = new Card(cardValues.charAt(i),Card.Suit.CLUBS);
+            masterPack[i+13] = new Card(cardValues.charAt(i),
+                  Card.Suit.DIAMONDS);
+            masterPack[i+26] = new Card(cardValues.charAt(i),Card.Suit.HEARTS);
+            masterPack[i+39] = new Card(cardValues.charAt(i),Card.Suit.SPADES);
+         }
+      }
+   }
+}
+
+/**************** Output *******************
+
+Phase 3 Run:
+
+K of SPADES / Q of SPADES / J of SPADES / T of SPADES / 9 of SPADES / 8 of SPADE
+S / 7 of SPADES / 6 of SPADES / 5 of SPADES / 4 of SPADES / 3 of SPADES / 2 of S
+PADES / A of SPADES / K of HEARTS / Q of HEARTS / J of HEARTS / T of HEARTS / 9
+of HEARTS / 8 of HEARTS / 7 of HEARTS / 6 of HEARTS / 5 of HEARTS / 4 of HEARTS
+/ 3 of HEARTS / 2 of HEARTS / A of HEARTS / K of DIAMONDS / Q of DIAMONDS / J of
+DIAMONDS / T of DIAMONDS / 9 of DIAMONDS / 8 of DIAMONDS / 7 of DIAMONDS / 6 of
+DIAMONDS / 5 of DIAMONDS / 4 of DIAMONDS / 3 of DIAMONDS / 2 of DIAMONDS / A of
+DIAMONDS / K of CLUBS / Q of CLUBS / J of CLUBS / T of CLUBS / 9 of CLUBS / 8 o
+f CLUBS / 7 of CLUBS / 6 of CLUBS / 5 of CLUBS / 4 of CLUBS / 3 of CLUBS / 2 of
+CLUBS / A of CLUBS / K of SPADES / Q of SPADES / J of SPADES / T of SPADES / 9 o
+f SPADES / 8 of SPADES / 7 of SPADES / 6 of SPADES / 5 of SPADES / 4 of SPADES /
+3 of SPADES / 2 of SPADES / A of SPADES / K of HEARTS / Q of HEARTS / J of HEAR
+TS / T of HEARTS / 9 of HEARTS / 8 of HEARTS / 7 of HEARTS / 6 of HEARTS / 5 of
+HEARTS / 4 of HEARTS / 3 of HEARTS / 2 of HEARTS / A of HEARTS / K of DIAMONDS /
+Q of DIAMONDS / J of DIAMONDS / T of DIAMONDS / 9 of DIAMONDS / 8 of DIAMONDS /
+7 of DIAMONDS / 6 of DIAMONDS / 5 of DIAMONDS / 4 of DIAMONDS / 3 of DIAMONDS /
+2 of DIAMONDS / A of DIAMONDS / K of CLUBS / Q of CLUBS / J of CLUBS / T of CLU
+BS / 9 of CLUBS / 8 of CLUBS / 7 of CLUBS / 6 of CLUBS / 5 of CLUBS / 4 of CLUBS
+/ 3 of CLUBS / 2 of CLUBS / A of CLUBS / 
+2 of CLUBS / 6 of HEARTS / 6 of HEARTS / Q of SPADES / 9 of CLUBS / 5 of SPADES
+/ 4 of SPADES / Q of DIAMONDS / Q of CLUBS / 8 of HEARTS / 9 of SPADES / 2 of CL
+UBS / 6 of CLUBS / 4 of DIAMONDS / 8 of SPADES / 5 of DIAMONDS / 6 of SPADES / T
+of CLUBS / 2 of HEARTS / J of SPADES / 6 of DIAMONDS / 8 of HEARTS / 3 of DIAMO
+NDS / J of SPADES / 3 of CLUBS / 7 of CLUBS / 6 of CLUBS / J of HEARTS / T of HE
+ARTS / 7 of CLUBS / 2 of HEARTS / 7 of HEARTS / 3 of HEARTS / 7 of DIAMONDS / 3
+of DIAMONDS / J of CLUBS / 7 of SPADES / 9 of HEARTS / K of SPADES / 5 of HEARTS
+/ 6 of DIAMONDS / T of HEARTS / T of SPADES / A of SPADES / 8 of SPADES / 8 of 
+CLUBS / Q of HEARTS / A of HEARTS / 8 of DIAMONDS / 5 of CLUBS / 8 of DIAMONDS /
+6 of SPADES / Q of HEARTS / 4 of SPADES / A of HEARTS / 7 of HEARTS / 9 of DIAM
+ONDS / K of SPADES / 7 of DIAMONDS / 4 of CLUBS / T of DIAMONDS / 9 of CLUBS / K
+ of DIAMONDS / A of DIAMONDS / J of DIAMONDS / 4 of HEARTS / 9 of DIAMONDS / J o
+f DIAMONDS / J of HEARTS / 7 of SPADES / J of CLUBS / 4 of CLUBS / A of CLUBS /
+4 of HEARTS / 4 of DIAMONDS / 3 of CLUBS / T of SPADES / T of DIAMONDS / 5 of HE
+ARTS / 9 of HEARTS / Q of SPADES / 5 of SPADES / K of CLUBS / A of CLUBS / 2 of
+SPADES / 8 of CLUBS / K of HEARTS / 2 of SPADES / 9 of SPADES / 3 of SPADES / A
+of SPADES / T of CLUBS / 2 of DIAMONDS / A of DIAMONDS / 3 of HEARTS / K of CLUB
+S / Q of DIAMONDS / 2 of DIAMONDS / 5 of CLUBS / Q of CLUBS / K of DIAMONDS / 5
+of DIAMONDS / 3 of SPADES / K of HEARTS /
+
+K of SPADES / Q of SPADES / J of SPADES / T of SPADES / 9 of SPADES / 8 of SPADE
+S / 7 of SPADES / 6 of SPADES / 5 of SPADES / 4 of SPADES / 3 of SPADES / 2 of S
+PADES / A of SPADES / K of HEARTS / Q of HEARTS / J of HEARTS / T of HEARTS / 9
+of HEARTS / 8 of HEARTS / 7 of HEARTS / 6 of HEARTS / 5 of HEARTS / 4 of HEARTS
+/ 3 of HEARTS / 2 of HEARTS / A of HEARTS / K of DIAMONDS / Q of DIAMONDS / J of
+DIAMONDS / T of DIAMONDS / 9 of DIAMONDS / 8 of DIAMONDS / 7 of DIAMONDS / 6 of
+DIAMONDS / 5 of DIAMONDS / 4 of DIAMONDS / 3 of DIAMONDS / 2 of DIAMONDS / A of
+DIAMONDS / K of CLUBS / Q of CLUBS / J of CLUBS / T of CLUBS / 9 of CLUBS / 8 o
+f CLUBS / 7 of CLUBS / 6 of CLUBS / 5 of CLUBS / 4 of CLUBS / 3 of CLUBS / 2 of
+CLUBS / A of CLUBS /
+
+8 of CLUBS / 4 of DIAMONDS / 2 of DIAMONDS / 5 of CLUBS / 8 of HEARTS / 4 of HEA
+RTS / 8 of DIAMONDS / 5 of HEARTS / 3 of SPADES / J of CLUBS / 9 of SPADES / K o
+f SPADES / 9 of CLUBS / 9 of DIAMONDS / 6 of HEARTS / 3 of CLUBS / J of HEARTS /
+T of HEARTS / 7 of DIAMONDS / K of CLUBS / A of HEARTS / A of CLUBS / Q of DIAM
+ONDS / A of SPADES / 3 of HEARTS / 8 of SPADES / T of CLUBS / 7 of SPADES / 5 of
+SPADES / J of DIAMONDS / 3 of DIAMONDS / 7 of HEARTS / 5 of DIAMONDS / 6 of SPA
+DES / Q of HEARTS / 6 of DIAMONDS / 2 of SPADES / 6 of CLUBS / 7 of CLUBS / J of
+SPADES / T of SPADES / 9 of HEARTS / A of DIAMONDS / 4 of CLUBS / 4 of SPADES /
+T of DIAMONDS / 2 of CLUBS / Q of SPADES / K of DIAMONDS / Q of CLUBS / K of HE
+ARTS / 2 of HEARTS /
+
+ Phase 4 Run:
+
+How many hands? (1 - 10 only, 0 to quit)7
+
+Here are our hands, from unshuffled deck:
+
+Player 1 Hand = ( K of SPADES, 6 of SPADES, Q of HEARTS, 5 of HEARTS, J of DIAMO
+NDS, 4 of DIAMONDS, T of CLUBS, 3 of CLUBS,  )
+
+Player 2 Hand = ( Q of SPADES, 5 of SPADES, J of HEARTS, 4 of HEARTS, T of DIAMO
+NDS, 3 of DIAMONDS, 9 of CLUBS, 2 of CLUBS,  )
+
+Player 3 Hand = ( J of SPADES, 4 of SPADES, T of HEARTS, 3 of HEARTS, 9 of DIAMO
+NDS, 2 of DIAMONDS, 8 of CLUBS, A of CLUBS,  )
+
+Player 4 Hand = ( T of SPADES, 3 of SPADES, 9 of HEARTS, 2 of HEARTS, 8 of DIAMO
+NDS, A of DIAMONDS, 7 of CLUBS,  )
+
+Player 5 Hand = ( 9 of SPADES, 2 of SPADES, 8 of HEARTS, A of HEARTS, 7 of DIAMO
+NDS, K of CLUBS, 6 of CLUBS,  )
+
+Player 6 Hand = ( 8 of SPADES, A of SPADES, 7 of HEARTS, K of DIAMONDS, 6 of DIA
+MONDS, Q of CLUBS, 5 of CLUBS,  )
+
+Player 7 Hand = ( 7 of SPADES, K of HEARTS, 6 of HEARTS, Q of DIAMONDS, 5 of DIA
+MONDS, J of CLUBS, 4 of CLUBS,  )
+
+Here are our hands, from shuffled deck:
+
+Player 1 Hand = ( Q of SPADES, 8 of CLUBS, K of SPADES, 8 of DIAMONDS, 6 of HEAR
+TS, K of HEARTS, K of DIAMONDS, 7 of CLUBS,  )
+
+Player 2 Hand = ( T of CLUBS, K of CLUBS, 2 of SPADES, 5 of SPADES, Q of HEARTS,
+2 of CLUBS, 5 of CLUBS, 8 of HEARTS,  )
+
+Player 3 Hand = ( 3 of CLUBS, 3 of DIAMONDS, A of CLUBS, T of SPADES, 6 of DIAMO
+NDS, 9 of CLUBS, J of HEARTS, 9 of SPADES,  )
+
+Player 4 Hand = ( 6 of CLUBS, 4 of SPADES, 4 of HEARTS, A of HEARTS, J of DIAMON
+DS, 5 of DIAMONDS, 9 of HEARTS,  )
+
+Player 5 Hand = ( T of DIAMONDS, 7 of DIAMONDS, 2 of HEARTS, 3 of HEARTS, J of C
+LUBS, 9 of DIAMONDS, 4 of CLUBS,  )
+
+Player 6 Hand = ( A of SPADES, A of DIAMONDS, 3 of SPADES, 8 of SPADES, T of HEA
+RTS, 7 of HEARTS, Q of DIAMONDS,  )
+
+Player 7 Hand = ( 2 of DIAMONDS, 7 of SPADES, J of SPADES, 6 of SPADES, Q of CLU
+BS, 5 of HEARTS, 4 of DIAMONDS,  )
+
+How many hands? (1 - 10 only, 0 to quit)
+
+ *******************************************/
